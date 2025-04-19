@@ -1,16 +1,24 @@
 # For generators
-GEN_SOURCES=$(wildcard html/*.hpp json/*.hpp generators/*.hpp)
-LIB_NAME=libbeg.a
+CC:=g++
+GEN_SOURCES:=$(wildcard html/*.cpp json/*.cpp)
+GEN_OUTPUT:=libbackend.o
+LIB_NAME:=libbeg.a
+
+%.o: %.cpp
+	$(CC) -c $< -o $@
 
 # builds generators library
-gen:
-	gcc -c $(GEN_SOURCES)
-	gcc $(GEN_SOURCES:.hpp=.hpp.gch) -o libbackend.o
+gen: $(GEN_SOURCES:.cpp=.o)
+	$(CC) -o $(GEN_OUTPUT) $^
 	ar rcs libbeg.a libbackend.o
+	ranlib -U libbeg.a
 
 # builds back end executable
-backend:
-	gcc main.cpp -L. libbeg.a -o backend
+backend: gen
+	$(CC) main.cpp -L. libbeg.a -o backend
+
+run: backend
+	./backend
 
 clear:
-	rm $(wildcard *.o *.a ./*/*.gch) $(LIB_NAME) backend
+	rm $(wildcard ./*/*.o *.a ./*/*.gch) $(LIB_NAME) backend
