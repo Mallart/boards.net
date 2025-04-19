@@ -55,9 +55,22 @@ namespace BoardsDotNet::JSON
         }
 
         // Parses a json string into an actual object
-        // TODO
         virtual Object FromString(::std::string json_content)
         {
+            int _brace_rotator = 0;
+            size_t _to = 0;
+            for(size_t i = 0; i < json_content.length(); ++i)
+            {
+                switch(json_content[i])
+                {
+                    case '{': _brace_rotator++; break;
+                    case '}': _brace_rotator--; break;
+                }
+                // when the rotator is null, opening and closing braces are even -> object is delimited
+                if(!_brace_rotator)
+                    break;
+            }
+            
             return (Object)0;
         }
 
