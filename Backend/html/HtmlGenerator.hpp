@@ -1,3 +1,6 @@
+#ifndef HTML_GEN_HPP
+#define HTML_GEN_HPP
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -99,3 +102,5 @@ namespace BoardsDotNet::HTML
         HTMLNode body;
     };
 }
+
+#endif

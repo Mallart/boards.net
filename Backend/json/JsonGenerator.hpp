@@ -1,3 +1,6 @@
+#ifndef JSON_GEN_HPP
+#define JSON_GEN_HPP
+
 #include <vector>
 #include <string>
 
@@ -39,25 +42,68 @@ namespace BoardsDotNet::JSON
                     return name + ":\"" + value + "\"";
             }
         };
-        Object(); 
-        virtual ::std::string ToString()
-        {
 
-        };
     protected:
+        ::std::string name;
         ::std::vector<Property> _Properties;
         ::std::vector<Object*> _Children;
+    public:
+    
+        Object(::std::string _name)
+        {
+            name = _name;
+        }
+
+        // Parses a json string into an actual object
+        // TODO
+        virtual Object FromString(::std::string json_content)
+        {
+            return (Object)0;
+        }
+
+        virtual ::std::string ToString()
+        {
+            ::std::string r;
+            if(name.empty())
+                r = "{";
+            else
+                r = "\"" + name + "\"" + ":{";
+            
+            for(Property p : _Properties)
+                r += p.ToString() + ",";
+            if(!_Properties.empty())
+                r.erase(r.length(), 1); // deletes last comma
+
+            for(Object* o : _Children)
+                r += o->ToString() + ",";
+            if(!_Children.empty())
+                r.erase(r.length(), 1); // deletes last comma
+
+            
+                
+            return r + "}";
+        };
     };
 
     class Array : public Object
     {
     public:
-        Array(::std::vector<Object*> objects);
+        Array(::std::string name, ::std::vector<Object*> objects) : Object{name}
+        {
+            _Children = objects;
+        }
+
         ::std::string ToString() override
         {
             ::std::string r = "[";
+            for(Object* o : _Children)
+                r += o->ToString() + ",";
+            if(!_Children.empty())
+                r.erase(r.length(), 1); // deletes last comma
 
             return r + "]";
         }
     };
 }
+
+#endif
