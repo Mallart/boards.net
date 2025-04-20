@@ -2,6 +2,7 @@
 #define JSON_GEN_HPP
 
 #include "../generators/Generators.hpp"
+#include <cstdint>
 #include <cstdio>
 #include <stdexcept>
 
@@ -13,6 +14,33 @@ namespace BoardsDotNet::JSON
             _Children.push_back(object);
         else
             throw ::std::invalid_argument("In-array object shouldn't have a name.");
+    }
+
+    Array* Array::FromString(::std::string source)
+    {
+        int64_t _bracket_rotator = 0;
+        size_t _to;
+        // sets the parsing limits; the closing brace that goes in pair with the first given opening one.
+        for(; _to < source.length(); ++_to)
+        {
+            switch(source[_to])
+            {
+                case '[': _bracket_rotator++; break;
+                case ']': _bracket_rotator--; break;
+            }
+            // when the rotator is null, opening and closing braces are even -> object is delimited
+            if(!_bracket_rotator)
+                break;
+        }
+        if(_to == source.length() - 1)
+        {
+            throw ::std::invalid_argument("Given source JSON seems invalid: no closing bracket found to close root array.");
+            return (Array*)0;
+        }
+        // actual parsing
+        ::std::string _subobj = source.substr(source.find('['), _to - source.find('['));
+
+        return (Object*)0;
     }
 
     ::std::string Array::ToString()
@@ -73,13 +101,14 @@ namespace BoardsDotNet::JSON
         return !(_Children.size() + _Properties.size());
     }
 
-    Object Object::FromString(::std::string json_content)
+    Object* Object::FromString(::std::string source)
     {
-        int _brace_rotator = 0;
-        size_t _to = 0;
-        for(size_t i = 0; i < json_content.length(); ++i)
+        int64_t _brace_rotator = 0;
+        size_t _to;
+        // sets the parsing limits; the closing brace that goes in pair with the first given opening one.
+        for(; _to < source.length(); ++_to)
         {
-            switch(json_content[i])
+            switch(source[_to])
             {
                 case '{': _brace_rotator++; break;
                 case '}': _brace_rotator--; break;
@@ -88,8 +117,13 @@ namespace BoardsDotNet::JSON
             if(!_brace_rotator)
                 break;
         }
+        if(_to == source.length() - 1 && _brace_rotator)
+        {
+            throw ::std::invalid_argument("Given source JSON seems invalid: no closing brace found to close root object.");
+            return (Object*)0;
+        }
         
-        return (Object)0;
+        return (Object*)0;
     }
 
     ::std::string Object::ToString()

@@ -75,6 +75,8 @@ namespace BoardsDotNet
             }
             
             virtual void AddChild(Array* object);
+            // Builds an array based on the parsing result from given source
+            static Array* FromString(::std::string source);
             virtual ::std::string ToString();
         };
 
@@ -121,7 +123,7 @@ namespace BoardsDotNet
             void AddProperty(Property property);
             void AddChild(Array* object) override;
             // Parses a json string into an actual object
-            virtual Object FromString(::std::string json_content);
+            static Object* FromString(::std::string source);
             ::std::string ToString() override;
         };
     }
