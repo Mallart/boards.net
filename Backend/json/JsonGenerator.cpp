@@ -7,15 +7,18 @@
 
 namespace BoardsDotNet::JSON 
 {
-    void Array::AddChild(Object* object)
+    void Array::AddChild(Array* object)
     {
-        _Children.push_back(object);
+        if(object->name.empty())
+            _Children.push_back(object);
+        else
+            throw ::std::invalid_argument("In-array object shouldn't have a name.");
     }
 
     ::std::string Array::ToString()
     {
-        ::std::string r = "[";
-        for(Object* o : _Children)
+        ::std::string r = "\"" + name + "\":[";
+        for(Array* o : _Children)
             r += o->ToString() + ",";
         if(!_Children.empty())
             r.erase(r.length() - 1, 1); // deletes last comma
@@ -55,14 +58,14 @@ namespace BoardsDotNet::JSON
         _Properties.push_back(property);
     }
 
-    void Object::AddChild(Object* object)
+    void Object::AddChild(Array* object)
     {
-        if(object->IsString())
+        if(dynamic_cast<Object*>(object) && ((Object*)object)->IsString())
         {
             throw ::std::invalid_argument("Cannot add a string to an object. Use a property instead.");
             return;
         }
-        Array::AddChild(object);
+        _Children.push_back(object);
     }
 
     bool Object::IsString()
@@ -106,7 +109,7 @@ namespace BoardsDotNet::JSON
         if(!_Properties.empty() && _Children.empty())
             r.erase(r.length() - 1, 1); // deletes last comma
 
-        for(Object* o : _Children)
+        for(Array* o : _Children)
             r += o->ToString() + ",";
         if(!_Children.empty())
             r.erase(r.length() - 1, 1); // deletes last comma

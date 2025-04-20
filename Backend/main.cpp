@@ -9,9 +9,12 @@ void JSONTest(void)
     jobj.AddProperty({"Root", "None"});
     jobj.AddChild(
         new Object(
-            "Rawr", {},{
+            "Rawr", {{"prop1", "val1"}},{
                 new Object("awa", {{"prop1", "val1"}}, {}),
-                new Object("owo", {{"prop1", "val2"}}, {})
+                new Object("owo", {{"prop1", "val2"}}, {}),
+                new Array("ArrayExample", {
+                    new Object({{"exampleprop", "examplevalue"}}, {new Object("testobj", {{"prop2", "val1"}}, {})})
+                }),
             }
         )
     );

@@ -60,19 +60,21 @@ namespace BoardsDotNet
                         
             protected:
             ::std::string name;
-            ::std::vector<Object*> _Children;
+            ::std::vector<Array*> _Children;
             public:
             Array(::std::string _name)
             {
                 name = _name;
             }
 
-            Array(::std::string name, ::std::initializer_list<Object*> objects)
+            Array(::std::string _name, ::std::initializer_list<Array*> objects)
             {
-                _Children = objects;
+                name = _name;
+                for(Array* array : objects)
+                    AddChild(array);
             }
             
-            virtual void AddChild(Object* object);
+            virtual void AddChild(Array* object);
             virtual ::std::string ToString();
         };
 
@@ -97,19 +99,19 @@ namespace BoardsDotNet
             // Creates an anonymous object, like a JSON root
             Object() : Array{::std::string()} {};
             // Builds an object initialized with sub objects
-            Object(::std::initializer_list<Property> _properties, ::std::initializer_list<Object*> _objects) : Object() 
+            Object(::std::initializer_list<Property> _properties, ::std::initializer_list<Array*> _objects) : Object() 
             {
                 for(Property property : _properties)
                     AddProperty(property);
-                for(Object* obj : _objects)
+                for(Array* obj : _objects)
                     AddChild(obj);
             }
             // Builds an object initialized witha name and sub objects
-            Object(::std::string _name, ::std::initializer_list<Property> _properties, ::std::initializer_list<Object*> _objects) : Object{_name} 
+            Object(::std::string _name, ::std::initializer_list<Property> _properties, ::std::initializer_list<Array*> _objects) : Object{_name} 
             {
                 for(Property property : _properties)
                     AddProperty(property);
-                for(Object* obj : _objects)
+                for(Array* obj : _objects)
                     AddChild(obj);
             }
 
@@ -117,7 +119,7 @@ namespace BoardsDotNet
             bool IsString();
             
             void AddProperty(Property property);
-            void AddChild(Object* object) override;
+            void AddChild(Array* object) override;
             // Parses a json string into an actual object
             virtual Object FromString(::std::string json_content);
             ::std::string ToString() override;
