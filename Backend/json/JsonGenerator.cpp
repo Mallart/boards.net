@@ -2,7 +2,7 @@
 #define JSON_GEN_HPP
 
 #include "../generators/Generators.hpp"
-#include <exception>
+#include <cstdio>
 #include <stdexcept>
 
 namespace BoardsDotNet::JSON 
@@ -65,6 +65,10 @@ namespace BoardsDotNet::JSON
         Array::AddChild(object);
     }
 
+    bool Object::IsString()
+    {
+        return !(_Children.size() + _Properties.size());
+    }
 
     Object Object::FromString(::std::string json_content)
     {

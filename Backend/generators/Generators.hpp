@@ -97,9 +97,21 @@ namespace BoardsDotNet
             // Creates an anonymous object, like a JSON root
             Object() : Array{::std::string()} {};
             // Builds an object initialized with sub objects
-            Object(::std::initializer_list<Object*> _objects) : Array{::std::string(), _objects} {}
+            Object(::std::initializer_list<Property> _properties, ::std::initializer_list<Object*> _objects) : Object() 
+            {
+                for(Property property : _properties)
+                    AddProperty(property);
+                for(Object* obj : _objects)
+                    AddChild(obj);
+            }
             // Builds an object initialized witha name and sub objects
-            Object(::std::string _name, ::std::initializer_list<Object*> _objects) : Array{_name, _objects} {}
+            Object(::std::string _name, ::std::initializer_list<Property> _properties, ::std::initializer_list<Object*> _objects) : Object{_name} 
+            {
+                for(Property property : _properties)
+                    AddProperty(property);
+                for(Object* obj : _objects)
+                    AddChild(obj);
+            }
 
             // Returns true if this object does NOT contain any property or sub object
             bool IsString();

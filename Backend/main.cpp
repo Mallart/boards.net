@@ -9,7 +9,10 @@ void JSONTest(void)
     jobj.AddProperty({"Root", "None"});
     jobj.AddChild(
         new Object(
-            "Rawr", {new Object("awa"), new Object("owo")}
+            "Rawr", {},{
+                new Object("awa", {{"prop1", "val1"}}, {}),
+                new Object("owo", {{"prop1", "val2"}}, {})
+            }
         )
     );
     ::std::cout << jobj.ToString() << ::std::endl;
