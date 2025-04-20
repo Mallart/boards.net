@@ -1,6 +1,7 @@
 #ifndef GENERATORS_HPP
 #define GENERATORS_HPP
 
+#include <initializer_list>
 #include <string>
 #include <vector>
 
@@ -52,9 +53,32 @@ namespace BoardsDotNet
 
     namespace JSON 
     {
-        class Object
+        class Object;
+
+        class Array
         {
+                        
+            protected:
+            ::std::string name;
+            ::std::vector<Object*> _Children;
             public:
+            Array(::std::string _name)
+            {
+                name = _name;
+            }
+
+            Array(::std::string name, ::std::initializer_list<Object*> objects)
+            {
+                _Children = objects;
+            }
+            
+            virtual void AddChild(Object* object);
+            virtual ::std::string ToString();
+        };
+
+        class Object : public Array
+        {
+        public:
             class Property
             {
                 ::std::string name;
@@ -65,27 +89,25 @@ namespace BoardsDotNet
                 ::std::string ToString();
             };
             
-            protected:
-            ::std::string name;
+        protected:
             ::std::vector<Property> _Properties;
-            ::std::vector<Object*> _Children;
-            public:
+        public:
             
-            Object(::std::string _name);
+            Object(::std::string _name) : Array{_name} {};
+            // Creates an anonymous object, like a JSON root
+            Object() : Array{::std::string()} {};
+            // Builds an object initialized with sub objects
+            Object(::std::initializer_list<Object*> _objects) : Array{::std::string(), _objects} {}
+            // Builds an object initialized witha name and sub objects
+            Object(::std::string _name, ::std::initializer_list<Object*> _objects) : Array{_name, _objects} {}
+
+            // Returns true if this object does NOT contain any property or sub object
+            bool IsString();
             
+            void AddProperty(Property property);
+            void AddChild(Object* object) override;
             // Parses a json string into an actual object
             virtual Object FromString(::std::string json_content);
-            virtual ::std::string ToString();
-        };
-        
-        class Array : public Object
-        {
-            public:
-            Array(::std::string name, ::std::vector<Object*> objects) : Object{name}
-            {
-                _Children = objects;
-            }
-            
             ::std::string ToString() override;
         };
     }

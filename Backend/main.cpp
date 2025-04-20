@@ -2,16 +2,23 @@
 #include <string>
 #include <iostream>
 
-void test(void)
+void JSONTest(void)
 {
-    auto jobj = BoardsDotNet::JSON::Object("uwu");
-    ::std::cout << jobj.ToString();
+    using namespace BoardsDotNet::JSON;
+    auto jobj = BoardsDotNet::JSON::Object();
+    jobj.AddProperty({"Root", "None"});
+    jobj.AddChild(
+        new Object(
+            "Rawr", {new Object("awa"), new Object("owo")}
+        )
+    );
+    ::std::cout << jobj.ToString() << ::std::endl;
 }
 
 
 int main(int argc, char** argv)
 {
     // ::std::string[] Argv = argv;
-    test();
+    JSONTest();
     return 0;
 }

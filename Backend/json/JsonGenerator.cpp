@@ -2,9 +2,27 @@
 #define JSON_GEN_HPP
 
 #include "../generators/Generators.hpp"
+#include <exception>
+#include <stdexcept>
 
 namespace BoardsDotNet::JSON 
 {
+    void Array::AddChild(Object* object)
+    {
+        _Children.push_back(object);
+    }
+
+    ::std::string Array::ToString()
+    {
+        ::std::string r = "[";
+        for(Object* o : _Children)
+            r += o->ToString() + ",";
+        if(!_Children.empty())
+            r.erase(r.length() - 1, 1); // deletes last comma
+    
+        return r + "]";
+    }
+
     bool Object::Property::isNumber()
     {
         for(char c : value)
@@ -27,15 +45,26 @@ namespace BoardsDotNet::JSON
     ::std::string Object::Property::ToString()
     {
         if(isNumber())
-            return name + ":" + value;
+            return "\"" + name + "\"" + ":" + value;
         else
-            return name + ":\"" + value + "\"";
+            return "\"" + name + "\"" + ":\"" + value + "\"";
     }
 
-    Object::Object(::std::string _name)
+    void Object::AddProperty(Object::Property property)
     {
-        name = _name;
+        _Properties.push_back(property);
     }
+
+    void Object::AddChild(Object* object)
+    {
+        if(object->IsString())
+        {
+            throw ::std::invalid_argument("Cannot add a string to an object. Use a property instead.");
+            return;
+        }
+        Array::AddChild(object);
+    }
+
 
     Object Object::FromString(::std::string json_content)
     {
@@ -59,34 +88,27 @@ namespace BoardsDotNet::JSON
     ::std::string Object::ToString()
     {
         ::std::string r;
-        if(name.empty())
-            r = "{";
+        if(_Children.empty() && _Properties.empty())
+            return "\"" + name + "\"";
         else
-            r = "\"" + name + "\"" + ":{";
-        
+            if(name.empty())
+                r = "{";
+            else
+                r = "\"" + name + "\"" + ":{";
+            // returns a simple string if no child or property is provided
+
         for(Property p : _Properties)
             r += p.ToString() + ",";
-        if(!_Properties.empty())
-            r.erase(r.length(), 1); // deletes last comma
+        if(!_Properties.empty() && _Children.empty())
+            r.erase(r.length() - 1, 1); // deletes last comma
 
         for(Object* o : _Children)
             r += o->ToString() + ",";
         if(!_Children.empty())
-            r.erase(r.length(), 1); // deletes last comma
+            r.erase(r.length() - 1, 1); // deletes last comma
 
         return r + "}";
     };
-
-    ::std::string Array::ToString()
-    {
-        ::std::string r = "[";
-        for(Object* o : _Children)
-            r += o->ToString() + ",";
-        if(!_Children.empty())
-            r.erase(r.length(), 1); // deletes last comma
-
-        return r + "]";
-    }
 };
 
 #endif
